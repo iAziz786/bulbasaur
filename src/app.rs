@@ -1,4 +1,4 @@
-use std::{collections::HashMap, error::Error, fs};
+use std::{collections::HashMap, error::Error};
 
 use crate::cli_config::CliConfig;
 
@@ -32,14 +32,12 @@ struct Stats {
 pub fn run(config: CliConfig) -> Result<(), Box<dyn Error>> {
     let mut stats = HashMap::new();
     let mut records = vec![];
-    let contents =
-        fs::read_to_string(config.filename).expect("Something went wrong while reading the file");
 
     let mut rdr = csv::ReaderBuilder::new()
         .trim(Trim::All)
-        // from_reader buffers by default, so we can expect the stream of data
+        // from_path buffers by default, so we can expect the stream of data
         // rather than loading the entire data in the memory.
-        .from_reader(contents.as_bytes());
+        .from_path(config.filename)?;
 
     for transaction in rdr.deserialize() {
         let txn: Transaction = transaction?;
